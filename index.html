@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bajet by Waziri — East African Meal & Budget App</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1b4332" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- AUTH VIEW -->
+  <div id="authScreen" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="logo-badge">BW</span>
+        <h1>Bajet by Waziri</h1>
+        <p>East African Meal Planner & KES Grocery Tracker</p>
+      </div>
+
+      <div class="tabs">
+        <button id="tabLogin" class="tab active">Log In</button>
+        <button id="tabRegister" class="tab">Create Account</button>
+      </div>
+
+      <form id="authForm" class="auth-form">
+        <div id="nameField" class="field hidden">
+          <label for="userName">Your Name / Jina Lako</label>
+          <input type="text" id="userName" placeholder="e.g. Wanjiku / Waziri" />
+        </div>
+
+        <div class="field">
+          <label for="phoneNumber">Mobile Number</label>
+          <div class="phone-row">
+            <select id="countryCode" aria-label="Country Code">
+              <option value="+254" selected>+254 (KE)</option>
+              <option value="+255">+255 (TZ)</option>
+              <option value="+256">+256 (UG)</option>
+              <option value="+251">+251 (ET)</option>
+            </select>
+            <input type="tel" id="phoneNumber" placeholder="712345678" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="userPin">4-Digit PIN</label>
+          <input type="password" id="userPin" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="••••" required />
+        </div>
+
+        <div id="otpBox" class="field hidden">
+          <label for="otpInput">Verification Code (Demo SMS OTP: <strong id="demoOtpDisplay"></strong>)</label>
+          <input type="text" id="otpInput" maxlength="4" inputmode="numeric" placeholder="Enter 4-digit code" />
+        </div>
+
+        <p id="authError" class="error-msg hidden"></p>
+        <button type="submit" id="authSubmitBtn" class="btn-primary full-width">Continue</button>
+      </form>
+
+      <div class="demo-box">
+        <button id="demoLoginBtn" type="button" class="btn-outline-dark full-width">Quick Demo Account (+254 700 000 000)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP VIEW -->
+  <div id="appScreen" class="hidden">
+    <header class="topbar">
+      <div>
+        <h1>Bajet by Waziri</h1>
+        <p id="userGreeting">Karibu!</p>
+      </div>
+      <div class="topbar-actions">
+        <button id="langToggle" class="btn-outline">Kiswahili</button>
+        <button id="logoutBtn" class="btn-outline">Log Out</button>
+      </div>
+    </header>
+
+    <nav class="subnav">
+      <button class="nav-btn active" data-view="plannerView" id="navPlanner">1. Meal Planner</button>
+      <button class="nav-btn" data-view="scheduleView" id="navSchedule">2. 7-Day Schedule</button>
+      <button class="nav-btn" data-view="groceryView" id="navGrocery">3. Shopping List</button>
+      <button class="nav-btn" data-view="trackerView" id="navTracker">4. M-Pesa & Custom Meals</button>
+    </nav>
+
+    <main class="container">
+      <!-- Live Budget Dashboard -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <span id="statSpentLbl">Planned Weekly Total</span>
+          <strong id="totalCost">KES 0</strong>
+        </div>
+        <div class="stat-card">
+          <span id="statFuelLbl">Est. Fuel Cost</span>
+          <strong id="fuelCost">KES 0</strong>
+        </div>
+        <div class="stat-card">
+          <span id="statReuseLbl">Ingredient Reuse Saved</span>
+          <strong id="reuseSaved">KES 0</strong>
+        </div>
+        <div class="stat-card">
+          <span id="statSavingsLbl">Monthly Savings Goal</span>
+          <strong id="projectedSavings">KES 0</strong>
+        </div>
+      </section>
+
+      <div id="alertBanner" class="alert hidden"></div>
+
+      <!-- VIEW 1: MEAL PLANNER -->
+      <div id="plannerView" class="view-section">
+        <section class="card controls-grid">
+          <div>
+            <label id="lblBudget">Weekly Budget (KES)</label>
+            <input type="number" id="weeklyBudget" min="500" step="100" />
+          </div>
+          <div>
+            <label id="lblSavings">Monthly Savings Target (KES)</label>
+            <input type="number" id="monthlyGoal" min="0" step="500" />
+          </div>
+          <div>
+            <label id="lblPeople">Household Size</label>
+            <select id="householdSize">
+              <option value="1">1 Person</option>
+              <option value="2">2 People</option>
+              <option value="4">4 People</option>
+              <option value="6">6+ People</option>
+            </select>
+          </div>
+          <div>
+            <label id="lblStore">Price Source</label>
+            <select id="priceSource">
+              <option value="market">Nakuru Wakulima Market</option>
+              <option value="supermarket">Supermarket</option>
+            </select>
+          </div>
+          <div>
+            <label id="lblRegion">Region</label>
+            <select id="regionFilter">
+              <option value="all">All East Africa</option>
+              <option value="Kenya">Kenya</option>
+              <option value="Tanzania">Tanzania</option>
+              <option value="Uganda">Uganda</option>
+              <option value="Ethiopia">Ethiopia</option>
+            </select>
+          </div>
+          <div>
+            <label id="lblDiet">Diet / Mode</label>
+            <select id="dietFilter">
+              <option value="all">All Meals</option>
+              <option value="veg">Vegetarian</option>
+              <option value="protein">High Protein</option>
+              <option value="student">Student Budget</option>
+            </select>
+          </div>
+          <div>
+            <label id="lblFuel">Cooking Fuel</label>
+            <select id="fuelType">
+              <option value="gas">LPG Gas</option>
+              <option value="charcoal">Charcoal (Makaa)</option>
+              <option value="electric">Electricity</option>
+            </select>
+          </div>
+          <div>
+            <label id="lblShopDay">Shopping Strategy</label>
+            <select id="shopStrategy">
+              <option value="wakulima">Saturday Wakulima Bulk Run</option>
+              <option value="midweek">Bulk + Midweek Top-up</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-header">
+            <h2 id="menuTitle">East African Dishes</h2>
+            <div class="btn-group">
+              <button id="autoPlanBtn" class="btn-accent">Auto-Fill Within Budget</button>
+              <button id="clearPlan" class="btn-danger">Clear Week</button>
+            </div>
+          </div>
+          <div id="mealGrid" class="meal-grid"></div>
+        </section>
+      </div>
+
+      <!-- VIEW 2: 7-DAY SCHEDULE -->
+      <div id="scheduleView" class="view-section hidden">
+        <section class="card">
+          <div class="section-header">
+            <h2>7-Day Meal Timetable</h2>
+            <span class="muted">Assign selected dishes across Monday–Sunday</span>
+          </div>
+          <div id="scheduleGrid" class="schedule-grid"></div>
+        </section>
+      </div>
+
+      <!-- VIEW 3: SMART SHOPPING LIST -->
+      <div id="groceryView" class="view-section hidden">
+        <section class="card">
+          <div class="section-header">
+            <h2 id="listTitle">Consolidated Shopping List</h2>
+            <button id="copyWhatsApp" class="btn-primary">Copy for WhatsApp</button>
+          </div>
+          <p id="shopNote" class="muted"></p>
+          <ul id="groceryList" class="grocery-list"></ul>
+        </section>
+      </div>
+
+      <!-- VIEW 4: EXPENSE TRACKER & CUSTOM MEALS -->
+      <div id="trackerView" class="view-section hidden">
+        <section class="card">
+          <h2>Actual Spending Log (M-Pesa / Cash)</h2>
+          <form id="expenseForm" class="inline-form">
+            <input type="text" id="expItem" placeholder="e.g. Wakulima Market greens / Naivas" required />
+            <input type="number" id="expAmount" placeholder="Amount (KES)" min="1" required />
+            <button type="submit" class="btn-primary">Log Spend</button>
+          </form>
+          <p class="muted" id="actualSpendSummary">Actual Spent This Week: KES 0</p>
+          <ul id="expenseList" class="grocery-list"></ul>
+        </section>
+
+        <section class="card">
+          <h2>Add Custom East African Dish</h2>
+          <form id="customMealForm" class="controls-grid">
+            <div>
+              <label>Dish Name (English)</label>
+              <input type="text" id="custNameEn" placeholder="e.g. Omena & Ugali" required />
+            </div>
+            <div>
+              <label>Dish Name (Kiswahili)</label>
+              <input type="text" id="custNameSw" placeholder="e.g. Omena na Ugali" required />
+            </div>
+            <div>
+              <label>Region</label>
+              <select id="custRegion">
+                <option value="Kenya">Kenya</option>
+                <option value="Tanzania">Tanzania</option>
+                <option value="Uganda">Uganda</option>
+                <option value="Ethiopia">Ethiopia</option>
+              </select>
+            </div>
+            <div>
+              <label>Est. Market Cost for 2 People (KES)</label>
+              <input type="number" id="custCost" min="50" value="220" required />
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <button type="submit" class="btn-primary">Save Custom Dish</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
